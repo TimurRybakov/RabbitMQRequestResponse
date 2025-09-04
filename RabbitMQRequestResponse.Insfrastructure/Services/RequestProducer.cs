@@ -1,24 +1,24 @@
-﻿using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Hosting;
 
 namespace RabbitMQRequestResponse.Insfrastructure.Services;
 
 public sealed class RequestProducer : BackgroundService
 {
-    private readonly IRequestSender _requestSender;
+    private readonly IRpcClient _rpcClient;
 
-    public RequestProducer(IRequestSender requestSender)
+    public RequestProducer(IRpcClient rpcClient)
     {
-        _requestSender = requestSender;
+        _rpcClient = rpcClient;
     }
 
     protected override Task ExecuteAsync(CancellationToken stoppingToken)
     {
-        return _requestSender.StartAsync(stoppingToken);
+        return _rpcClient.StartAsync(stoppingToken);
     }
 
     public override void Dispose()
     {
-        _requestSender.DisposeAsync().AsTask().GetAwaiter().GetResult();
+        _rpcClient.DisposeAsync().AsTask().GetAwaiter().GetResult();
         base.Dispose();
         GC.SuppressFinalize(this);
     }

@@ -1,4 +1,4 @@
-﻿using RabbitMQ.Client.Events;
+using RabbitMQ.Client.Events;
 using RabbitMQ.Client;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
@@ -8,30 +8,31 @@ using System.Text;
 
 namespace RabbitMQRequestResponse.Insfrastructure.Services;
 
-public interface IRequestSender : IAsyncDisposable
+public interface IRpcClient : IAsyncDisposable
 {
     Task StartAsync(CancellationToken cancellationToken);
 
     Task<string> SendAsync(string message, CancellationToken cancellationToken = default);
 }
 
-public sealed class RequestSender : IRequestSender
+public sealed class RpcClient : IRpcClient
 {
     private readonly ConnectionFactory _connectionFactory;
     private readonly string _queueName;
-    private readonly ILogger<RequestConsumer> _logger;
+    private readonly ILogger<RpcClient> _logger;
     private IConnection? _connection;
     private IChannel? _channel;
     private string? _responseQueueName;
     private readonly ConcurrentDictionary<string, TaskCompletionSource<string>> _callbackMapper = new();
 
-    public RequestSender(ILogger<RequestConsumer> logger, IOptions<RabbitMQOptions> rabbitMQOptions)
+    public RpcClient(ILogger<RpcClient> logger, IOptions<RabbitMQOptions> rabbitMQOptions)
     {
         _connectionFactory = new ConnectionFactory
         {
             HostName = rabbitMQOptions.Value.HostName,
+            Port = rabbitMQOptions.Value.Port,
             UserName = rabbitMQOptions.Value.UserName,
-            Password = rabbitMQOptions.Value.Password,
+            Password = rabbitMQOptions.Value.Password
         };
         _queueName = rabbitMQOptions.Value.RequestResponseQueueName;
         _logger = logger;        

@@ -14,7 +14,7 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
 builder.Services.Configure<RabbitMQOptions>(builder.Configuration.GetSection("RabbitMQ"));
-builder.Services.AddSingleton<IRequestSender, RequestSender>();
+builder.Services.AddSingleton<IRpcClient, RpcClient>();
 builder.Services.AddHostedService<RequestProducer>();
 
 var app = builder.Build();
@@ -33,11 +33,11 @@ app.UseHttpsRedirection();
 app.MapGet("/request",
     static async (
         string message,
-        IRequestSender requestSender,
+        IRpcClient rpcClient,
         CancellationToken cancellationToken
     ) =>
     {
-        var response = await requestSender.SendAsync(message, cancellationToken);
+        var response = await rpcClient.SendAsync(message, cancellationToken);
 
         return Results.Ok(response);
     })

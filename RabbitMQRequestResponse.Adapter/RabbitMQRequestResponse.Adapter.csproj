@@ -7,6 +7,7 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="Aspire.RabbitMQ.Client.v7" Version="9.4.2" />
     <PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="8.0.19" />
     <PackageReference Include="Microsoft.Extensions.ServiceDiscovery" Version="9.4.1" />
     <PackageReference Include="RabbitMQ.Client" Version="7.1.2" />

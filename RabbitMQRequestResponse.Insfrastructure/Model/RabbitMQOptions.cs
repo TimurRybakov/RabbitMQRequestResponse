@@ -1,8 +1,10 @@
-﻿namespace RabbitMQRequestResponse.Insfrastructure.Model;
+namespace RabbitMQRequestResponse.Insfrastructure.Model;
 
 public sealed record RabbitMQOptions
 {
     public string HostName { get; set; } = "";
+
+    public int Port { get; set; } = 5672;
 
     public string UserName { get; set; } = "";
 

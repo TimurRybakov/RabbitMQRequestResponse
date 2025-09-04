@@ -14,6 +14,7 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
 builder.Services.Configure<RabbitMQOptions>(builder.Configuration.GetSection("RabbitMQ"));
+builder.Services.AddSingleton<IRpcServer, RpcServer>();
 builder.Services.AddHostedService<RequestConsumer>();
 
 var app = builder.Build();
