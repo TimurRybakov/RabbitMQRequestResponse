@@ -1,10 +1,11 @@
-using RabbitMQ.Client.Events;
-using RabbitMQ.Client;
+using System.Collections.Concurrent;
+using System.Diagnostics;
+using System.Text;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
+using RabbitMQ.Client;
+using RabbitMQ.Client.Events;
 using RabbitMQRequestResponse.Insfrastructure.Model;
-using System.Collections.Concurrent;
-using System.Text;
 
 namespace RabbitMQRequestResponse.Insfrastructure.Services;
 
@@ -20,12 +21,13 @@ public sealed class RpcClient : IRpcClient
     private readonly ConnectionFactory _connectionFactory;
     private readonly string _queueName;
     private readonly ILogger<RpcClient> _logger;
+    private readonly ActivitySource _activitySource;
     private IConnection? _connection;
     private IChannel? _channel;
     private string? _responseQueueName;
     private readonly ConcurrentDictionary<string, TaskCompletionSource<string>> _callbackMapper = new();
 
-    public RpcClient(ILogger<RpcClient> logger, IOptions<RabbitMQOptions> rabbitMQOptions)
+    public RpcClient(ILogger<RpcClient> logger, IOptions<RabbitMQOptions> rabbitMQOptions, ActivitySource activitySource)
     {
         _connectionFactory = new ConnectionFactory
         {
@@ -35,7 +37,8 @@ public sealed class RpcClient : IRpcClient
             Password = rabbitMQOptions.Value.Password
         };
         _queueName = rabbitMQOptions.Value.RequestResponseQueueName;
-        _logger = logger;        
+        _logger = logger;
+        _activitySource = activitySource;
     }
 
     public async Task StartAsync(CancellationToken cancellationToken)
@@ -76,12 +79,14 @@ public sealed class RpcClient : IRpcClient
 
     public async Task<string> SendAsync(string message, CancellationToken cancellationToken)
     {
+        string correlationId = Guid.NewGuid().ToString();
+        using var activity = _activitySource.StartActivity(name: "Sending request", kind: ActivityKind.Internal, parentId: correlationId);
+
         if (_channel is null)
         {
             throw new InvalidOperationException();
         }
 
-        string correlationId = Guid.NewGuid().ToString();
         var props = new BasicProperties
         {
             CorrelationId = correlationId,

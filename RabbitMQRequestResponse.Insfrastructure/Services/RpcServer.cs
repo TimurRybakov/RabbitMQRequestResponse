@@ -1,3 +1,4 @@
+using System.Diagnostics;
 using System.Text;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
@@ -17,10 +18,11 @@ public sealed class RpcServer : IRpcServer
     private readonly ConnectionFactory _connectionFactory;
     private readonly string _queueName;
     private readonly ILogger<RpcServer> _logger;
+    private readonly ActivitySource _activitySource;
     private IConnection? _connection;
     private IChannel? _channel;
 
-    public RpcServer(ILogger<RpcServer> logger, IOptions<RabbitMQOptions> rabbitMQOptions)
+    public RpcServer(ILogger<RpcServer> logger, IOptions<RabbitMQOptions> rabbitMQOptions, ActivitySource activitySource)
     {
         _connectionFactory = new ConnectionFactory
         {
@@ -31,6 +33,7 @@ public sealed class RpcServer : IRpcServer
         };
         _queueName = rabbitMQOptions.Value.RequestResponseQueueName;
         _logger = logger;
+        _activitySource = activitySource;
     }
 
     public async Task StartAsync(CancellationToken cancellationToken)
@@ -52,27 +55,28 @@ public sealed class RpcServer : IRpcServer
                 AsyncEventingBasicConsumer consumer = (AsyncEventingBasicConsumer)sender;
                 IChannel channel = consumer.Channel;
                 IReadOnlyBasicProperties props = eventArgs.BasicProperties;
-                var corellationId = props.CorrelationId;
+                var correlationId = props.CorrelationId;
+                using var activity = _activitySource.StartActivity(name: "Sending response", kind: ActivityKind.Internal, parentId: correlationId);
                 string response = string.Empty;
                 var replyProps = new BasicProperties
                 {
-                    CorrelationId = corellationId
+                    CorrelationId = correlationId
                 };
 
                 try
                 {
-                    if (corellationId is null)
+                    if (correlationId is null)
                     {
                         response = "CorrelationId is not set.";
                         return;
                     }
                     var message = Encoding.UTF8.GetString(eventArgs.Body.Span);
-                    _logger.LogInformation("Message {CorellationId} was processed: {Message}", corellationId, message);
-                    response = $"Message {corellationId} processed: {message}.";
+                    _logger.LogInformation("Message {CorellationId} was processed: {Message}", correlationId, message);
+                    response = $"Message {correlationId} processed: {message}.";
                 }
                 catch (Exception e)
                 {
-                    _logger.LogError("Error processings message {CorellationId}: {Error}", corellationId, e.Message);
+                    _logger.LogError("Error processings message {CorellationId}: {Error}", correlationId, e.Message);
                     response = string.Empty;
                 }
                 finally
