@@ -18,6 +18,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\RabbitMQRequestResponse.Adapter\RabbitMQRequestResponse.Adapter.csproj" />
+    <ProjectReference Include="..\RabbitMQRequestResponse.Handler\RabbitMQRequestResponse.Handler.csproj" />
   </ItemGroup>
 
 </Project>

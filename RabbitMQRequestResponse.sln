@@ -1,6 +1,6 @@
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
-VisualStudioVersion = 17.12.35728.132 d17.12
+VisualStudioVersion = 17.12.35728.132
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RabbitMQRequestResponse.AppHost", "RabbitMQRequestResponse.AppHost\RabbitMQRequestResponse.AppHost.csproj", "{719EBEF5-4766-4547-AD33-904B8663670B}"
 EndProject
@@ -13,6 +13,8 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Aspire", "Aspire", "{640F0B06-9DFA-4363-B919-1ECB2F2124C4}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Services", "Services", "{89EB47EA-F132-4DAF-8005-1D1A694890CB}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RabbitMQRequestResponse.Handler", "RabbitMQRequestResponse.Handler\RabbitMQRequestResponse.Handler.csproj", "{7A55C963-D9D4-4E08-9F95-B44F4B0D08B2}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -36,6 +38,10 @@ Global
 		{87B2FABC-29E7-4A35-BA80-16F771EB5D0E}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{87B2FABC-29E7-4A35-BA80-16F771EB5D0E}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{87B2FABC-29E7-4A35-BA80-16F771EB5D0E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{7A55C963-D9D4-4E08-9F95-B44F4B0D08B2}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{7A55C963-D9D4-4E08-9F95-B44F4B0D08B2}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{7A55C963-D9D4-4E08-9F95-B44F4B0D08B2}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{7A55C963-D9D4-4E08-9F95-B44F4B0D08B2}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -44,5 +50,6 @@ Global
 		{719EBEF5-4766-4547-AD33-904B8663670B} = {640F0B06-9DFA-4363-B919-1ECB2F2124C4}
 		{8F22015C-B4D7-465D-814B-EE7E49085E97} = {640F0B06-9DFA-4363-B919-1ECB2F2124C4}
 		{F2FBBD41-98FD-4107-A8D3-75CF7AF5AA80} = {89EB47EA-F132-4DAF-8005-1D1A694890CB}
+		{7A55C963-D9D4-4E08-9F95-B44F4B0D08B2} = {89EB47EA-F132-4DAF-8005-1D1A694890CB}
 	EndGlobalSection
 EndGlobal

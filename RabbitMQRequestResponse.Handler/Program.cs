@@ -14,8 +14,7 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
 builder.Services.Configure<RabbitMQOptions>(builder.Configuration.GetSection("RabbitMQ"));
-builder.Services.AddSingleton<IRequestSender, RequestSender>();
-builder.Services.AddHostedService<RequestProducer>();
+builder.Services.AddHostedService<RequestConsumer>();
 
 var app = builder.Build();
 
@@ -30,18 +29,5 @@ if (app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 
-app.MapGet("/request",
-    static async (
-        string message,
-        IRequestSender requestSender,
-        CancellationToken cancellationToken
-    ) =>
-    {
-        var response = await requestSender.SendAsync(message, cancellationToken);
+app.Run();
 
-        return Results.Ok(response);
-    })
-.WithName("GetWeatherForecast")
-.WithOpenApi();
-
-await app.RunAsync();
