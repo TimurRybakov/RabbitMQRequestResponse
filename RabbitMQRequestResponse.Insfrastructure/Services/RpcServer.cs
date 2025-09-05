@@ -56,12 +56,13 @@ public sealed class RpcServer : IRpcServer
                 IChannel channel = consumer.Channel;
                 IReadOnlyBasicProperties props = eventArgs.BasicProperties;
                 var correlationId = props.CorrelationId;
-                using var activity = _activitySource.StartActivity(name: "Sending response", kind: ActivityKind.Internal, parentId: correlationId);
                 string response = string.Empty;
                 var replyProps = new BasicProperties
                 {
                     CorrelationId = correlationId
                 };
+
+                using var activity = _activitySource.StartReceiveActivity(props, "RpcServer");
 
                 try
                 {

@@ -80,7 +80,6 @@ public sealed class RpcClient : IRpcClient
     public async Task<string> SendAsync(string message, CancellationToken cancellationToken)
     {
         string correlationId = Guid.NewGuid().ToString();
-        using var activity = _activitySource.StartActivity(name: "Sending request", kind: ActivityKind.Internal, parentId: correlationId);
 
         if (_channel is null)
         {
@@ -92,6 +91,8 @@ public sealed class RpcClient : IRpcClient
             CorrelationId = correlationId,
             ReplyTo = _responseQueueName
         };
+
+        using var activity = _activitySource.StartSendActivity(props, "RpcClient");
 
         var tcs = new TaskCompletionSource<string>(TaskCreationOptions.RunContinuationsAsynchronously);
         _callbackMapper.TryAdd(correlationId, tcs);
