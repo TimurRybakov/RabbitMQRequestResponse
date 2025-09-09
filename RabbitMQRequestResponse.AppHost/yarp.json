@@ -1,0 +1,31 @@
+{
+  "Logging": {
+    "LogLevel": {
+      "Default": "Information",
+      "Microsoft.AspNetCore": "Information"
+    }
+  },
+  "AllowedHosts": "*",
+  "ReverseProxy": {
+    "Routes": {
+      "adapter": {
+        "ClusterId": "adapter",
+        "Match": {
+          "Path": "/adapter/{**catch-all}"
+        },
+        "Transforms": [
+          { "PathRemovePrefix": "/adapter" }
+        ]
+      }
+    },
+    "Clusters": {
+      "adapter": {
+        "Destinations": {
+          "adapter": {
+            "Address": "https://adapter"
+          }
+        }
+      }
+    }
+  }
+}

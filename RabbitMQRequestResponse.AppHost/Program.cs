@@ -6,18 +6,32 @@ var rabbitmq = builder.AddRabbitMQ("rabbit", username, password, port: 5672)
     .WithManagementPlugin()
     .WithDataVolume(isReadOnly: false);
 
-builder.AddProject<Projects.RabbitMQRequestResponse_Adapter>("adapter")
+var adapter1 = builder.AddProject<Projects.RabbitMQRequestResponse_Adapter>("adapter-1")
     .WithReference(rabbitmq)
     .WaitFor(rabbitmq)
     .WithEnvironment("rabbit.username", username)
     .WithEnvironment("rabbit.password", password)
-    .WithReplicas(2);
+    .WithHttpsEndpoint(port: 7301);
 
-builder.AddProject<Projects.RabbitMQRequestResponse_Handler>("handler")
+var adapter2 = builder.AddProject<Projects.RabbitMQRequestResponse_Adapter>("adapter-2")
+    .WithReference(rabbitmq)
+    .WaitFor(rabbitmq)
+    .WithEnvironment("rabbit.username", username)
+    .WithEnvironment("rabbit.password", password)
+    .WithHttpsEndpoint(port: 7302);
+
+var handler = builder.AddProject<Projects.RabbitMQRequestResponse_Handler>("handler")
     .WithReference(rabbitmq)
     .WaitFor(rabbitmq)
     .WithEnvironment("rabbit.username", username)
     .WithEnvironment("rabbit.password", password)
     .WithReplicas(4);
+
+builder.AddProject<Projects.RabbitMQRequestResponse_Gateway>("gateway")
+    .WithReference(adapter1)
+    .WaitFor(adapter1)
+    .WithReference(adapter2)
+    .WaitFor(adapter2)
+    .WithExternalHttpEndpoints();
 
 builder.Build().Run();
